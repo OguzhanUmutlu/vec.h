@@ -14,7 +14,6 @@
 
 * `vec(type)` - Defines a vector type of a given element `type`.
 * `vec_init(type, v, reserved)` - Initializes a vector with a specified reserved capacity.
-* `vec_create(type, reserved)` - Creates a vector and initializes it with a reserved capacity.
 * `vec_push(type, v, x)` - Adds an element `x` to the end of the vector.
 * `vec_pop(v)` - Removes the last element from the vector.
 * `vec_back(v)` - Accesses the last element in the vector.
