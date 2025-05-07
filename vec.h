@@ -74,7 +74,7 @@
         if ((n) > (v).capacity)                                                \
             vec_realloc(type, v, n);                                           \
     } while (0)
-#define vec_print(type, v, indent)                                             \
+#define vec_print(type, fn, v, indent)                                         \
     do {                                                                       \
         if (!(v).data)                                                         \
             return;                                                            \
@@ -83,7 +83,7 @@
             putchar('\n');                                                     \
         for (int i = 0; i < (v).size; i++) {                                   \
             print_indent(indent);                                              \
-            type##_print((v).data[i], (indent) + 2);                           \
+            fn((v).data[i], (indent) + 2);                                     \
             if (i < (v).size - 1)                                              \
                 putchar(',');                                                  \
             putchar('\n');                                                     \
