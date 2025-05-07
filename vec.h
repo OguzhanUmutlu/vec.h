@@ -30,7 +30,7 @@
 #define vec_empty(v) ((v).size == 0)
 #define vec_at(v, i)                                                           \
     {                                                                          \
-        if ((i) < 0 || (i) >= v.size) {                                        \
+        if ((i) < 0 || (i) >= (v).size) {                                      \
             perror("vector index out of bounds");                              \
             exit(1);                                                           \
         }                                                                      \
@@ -48,7 +48,7 @@
 #define vec_shrink(type, v)                                                    \
     do {                                                                       \
         if ((v).size != (v).capacity)                                          \
-            vec_realloc(type, v, v.size);                                      \
+            vec_realloc(type, v, (v).size);                                    \
     } while (0)
 #define vec_realloc(type, v, n)                                                \
     do {                                                                       \
