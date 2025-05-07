@@ -72,7 +72,7 @@
 #define vec_print(type, fn, v, indent)                                         \
     do {                                                                       \
         if (!(v).data)                                                         \
-            return;                                                            \
+            break;                                                             \
         printf(#type "([");                                                    \
         if ((v).size != 0)                                                     \
             putchar('\n');                                                     \
@@ -91,7 +91,7 @@
 #define vec_free2(v, fn)                                                       \
     do {                                                                       \
         if (!(v).data)                                                         \
-            return;                                                            \
+            break;                                                             \
         for (int __i0 = 0; __i0 < (v).size; __i0++) {                          \
             fn((v).data[__i0]);                                                \
         }                                                                      \
