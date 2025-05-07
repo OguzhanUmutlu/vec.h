@@ -16,18 +16,12 @@
             exit(EXIT_FAILURE);                                                \
         }                                                                      \
     } while (0)
-#define vec_create(type, reserved)                                             \
-    {                                                                          \
-        vec(type) _v;                                                          \
-        vec_init(_v);                                                          \
-        _v;                                                                    \
-    }
 #define vec_push(type, v, x)                                                   \
     do {                                                                       \
         if ((v).size >= (v).capacity)                                          \
-            vec_reserve(type, v,                                               \
-                        (v).capacity > 1 ? (v).capacity + (v).capacity >> 1    \
-                                         : 2);                                 \
+            vec_realloc(                                                       \
+                type, v,                                                       \
+                (v).capacity > 1 ? ((v).capacity + ((v).capacity >> 1)) : 2);  \
         (v).data[(v).size++] = x;                                              \
     } while (0)
 #define vec_pop(v) (v).data[--v.size]
@@ -58,7 +52,8 @@
     } while (0)
 #define vec_realloc(type, v, n)                                                \
     do {                                                                       \
-        if ((n) == (v).capacity) break;                                        \
+        if ((n) == (v).capacity)                                               \
+            break;                                                             \
         type *_newData = realloc((v).data, sizeof(type) * (n));                \
         if (!_newData && (n) > 0) {                                            \
             perror("realloc failed");                                          \
