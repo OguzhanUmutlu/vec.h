@@ -76,10 +76,10 @@
         printf(#type "([");                                                    \
         if ((v).size != 0)                                                     \
             putchar('\n');                                                     \
-        for (int i = 0; i < (v).size; i++) {                                   \
+        for (int __i0 = 0; __i0 < (v).size; __i0++) {                          \
             ___vec_print_indent(indent);                                       \
-            fn((v).data[i], (indent) + 2);                                     \
-            if (i < (v).size - 1)                                              \
+            fn((v).data[__i0], (indent) + 2);                                  \
+            if (__i0 < (v).size - 1)                                           \
                 putchar(',');                                                  \
             putchar('\n');                                                     \
         }                                                                      \
@@ -90,17 +90,17 @@
 #define vec_free(v) free(v.data)
 #define vec_free2(v, fn)                                                       \
     do {                                                                       \
-        if (!v.data)                                                           \
+        if (!(v).data)                                                         \
             return;                                                            \
-        for (int i = 0; i < v.size; i++) {                                     \
-            fn(v.data[i]);                                                     \
+        for (int __i0 = 0; __i0 < (v).size; __i0++) {                          \
+            fn((v).data[__i0]);                                                \
         }                                                                      \
-        free(v.data);                                                          \
+        free((v).data);                                                        \
     } while (0)
 #define ___vec_print_indent(indent)                                            \
     do {                                                                       \
-        for (int i = 0; i < indent * 2; i++)                                   \
-            putchar(' ')                                                       \
+        for (int __i1 = 0; __i1 < indent * 2; __i1++)                          \
+            putchar(' ');                                                      \
     } while (0)
 
 #endif // VEC_H_DEFINED
