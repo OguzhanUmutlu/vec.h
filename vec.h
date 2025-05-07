@@ -98,7 +98,9 @@
         free(v.data);                                                          \
     } while (0)
 #define ___vec_print_indent(indent)                                            \
-    for (int i = 0; i < indent * 2; i++)                                       \
-    putchar(' ')
+    do {                                                                       \
+        for (int i = 0; i < indent * 2; i++)                                   \
+            putchar(' ')                                                       \
+    } while (0)
 
 #endif // VEC_H_DEFINED
