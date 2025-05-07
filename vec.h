@@ -77,13 +77,13 @@
         if ((v).size != 0)                                                     \
             putchar('\n');                                                     \
         for (int i = 0; i < (v).size; i++) {                                   \
-            print_indent(indent);                                              \
+            ___vec_print_indent(indent);                                       \
             fn((v).data[i], (indent) + 2);                                     \
             if (i < (v).size - 1)                                              \
                 putchar(',');                                                  \
             putchar('\n');                                                     \
         }                                                                      \
-        print_indent((indent) - 1);                                            \
+        ___vec_print_indent((indent) - 1);                                     \
         putchar(']');                                                          \
         putchar(')');                                                          \
     } while (0)
@@ -97,5 +97,8 @@
         }                                                                      \
         free(v.data);                                                          \
     } while (0)
+#define ___vec_print_indent(indent)                                            \
+    for (int i = 0; i < indent * 2; i++)                                       \
+    putchar(' ')
 
 #endif // VEC_H_DEFINED
