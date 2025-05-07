@@ -24,7 +24,7 @@
 * `vec_resize(type, v, n, def_val)` - Resizes the vector to hold `n` elements, filling with `def_val` if needed.
 * `vec_shrink(type, v)` - Shrinks the vector's capacity to fit its size.
 * `vec_reserve(type, v, n)` - Reserves at least `n` elements' worth of capacity.
-* `vec_print(type, v, indent)` - Prints the vector contents using a custom print function for each element.
+* `vec_print(type, fn, v, indent)` - Prints the vector contents using a custom print function for each element.
 * `vec_free(v)` - Frees the memory used by the vector.
 * `vec_free2(v, fn)` - Frees the memory and applies a custom function `fn` to free each element.
 
@@ -34,7 +34,7 @@
 #include "vec.h"
 #include <stdio.h>
 
-void int_print(int x, int indent) {
+void print_number(int x, int indent) {
     for (int i = 0; i < indent; i++) putchar(' ');
     printf("%d", x);
 }
@@ -50,8 +50,8 @@ int main() {
     vec_push(int, v, 30);
     vec_push(int, v, 40);
 
-    // Print the vector
-    vec_print(int, v, 0);
+    // Print the vector with a custom function
+    vec_print(int, print_number, v, 0);
 
     // Access an element by index
     printf("\nElement at index 2: %d\n", vec_at(v, 2));
