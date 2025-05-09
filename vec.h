@@ -1,106 +1,184 @@
-#ifndef VEC_H_DEFINED
-#define VEC_H_DEFINED
+#ifndef VEC_V2_H_DEFINED
+#define VEC_V2_H_DEFINED
 
-#define vec(type)                                                              \
-    struct {                                                                   \
+/*
+ *                     __
+ *  _   _____  _____  / /_
+ * | | / / _ \/ ___/ / __ \
+ * | |/ /  __/ /___ / / / /
+ * |___/\___/\___(_)_/ /_/
+ *
+ * vec.h - Lightweight dynamic array implementation using macros in C.
+ * Author: OguzhanUmutlu
+ * License: MIT
+ */
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifndef __vec_fn_name_format
+#define __vec_fn_name_format(name, base, fn_name) vec_##base##_fn_name
+#endif
+
+#define vec_define(type, name, fn_name)                                        \
+    typedef struct {                                                           \
         int size, capacity;                                                    \
         type *data;                                                            \
-    }
-#define vec_init(type, v, reserved)                                            \
-    do {                                                                       \
-        (v).size = 0;                                                          \
-        (v).capacity = (reserved);                                             \
-        (v).data = malloc(sizeof(type) * (v).capacity);                        \
-        if (!(v).data) {                                                       \
+    } name;                                                                    \
+                                                                               \
+    static inline name *__vec_fn_name_format(name, alloc, fn_name)(void) {     \
+        return (name *)malloc(sizeof(name));                                   \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, init2, fn_name)(             \
+        name * v, size_t reserved) {                                           \
+        v->size = 0;                                                           \
+        v->capacity = reserved;                                                \
+        if (!(v->data = malloc(sizeof(type) * v->capacity))) {                 \
             perror("malloc failed");                                           \
             exit(EXIT_FAILURE);                                                \
         }                                                                      \
-    } while (0)
-#define vec_push(type, v, x)                                                   \
-    do {                                                                       \
-        if ((v).size >= (v).capacity)                                          \
-            vec_realloc(                                                       \
-                type, v,                                                       \
-                (v).capacity > 1 ? ((v).capacity + ((v).capacity >> 1)) : 2);  \
-        (v).data[(v).size++] = x;                                              \
-    } while (0)
-#define vec_pop(v) (v).data[--v.size]
-#define vec_back(v) (v).data[v.size - 1]
-#define vec_clear(v) (v).size = 0
-#define vec_empty(v) ((v).size == 0)
-#define vec_at(v, i)                                                           \
-    {                                                                          \
-        if ((i) < 0 || (i) >= (v).size) {                                      \
-            perror("vector index out of bounds");                              \
-            exit(1);                                                           \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, init, fn_name)(name * v) {   \
+        __vec_fn_name_format(name, init2, fn_name)(v, 4);                      \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, realloc,                     \
+                                            fn_name)(name * v, size_t n) {     \
+        if (n == v->capacity)                                                  \
+            return;                                                            \
+        if (n == 0) {                                                          \
+            free(v->data);                                                     \
+            v->data = NULL;                                                    \
+        } else if (v->data == NULL) {                                          \
+            v->data = malloc(sizeof(type) * n);                                \
+            if (!v->data) {                                                    \
+                perror("malloc failed");                                       \
+                exit(EXIT_FAILURE);                                            \
+            }                                                                  \
+        } else {                                                               \
+            type *newData = realloc(v->data, sizeof(type) * n);                \
+            if (!newData) {                                                    \
+                perror("realloc failed");                                      \
+                exit(EXIT_FAILURE);                                            \
+            }                                                                  \
+            v->data = newData;                                                 \
         }                                                                      \
-        (v).data[i];                                                           \
-    }
-
-#define vec_resize(type, v, n, def_val)                                        \
-    do {                                                                       \
-        if ((n) > (v).capacity)                                                \
-            vec_realloc(type, v, n);                                           \
-        while ((v).size < (n))                                                 \
-            (v).data[(v).size++] = (def_val);                                  \
-        (v).size = (n);                                                        \
-    } while (0)
-#define vec_shrink(type, v)                                                    \
-    do {                                                                       \
-        if ((v).size != (v).capacity)                                          \
-            vec_realloc(type, v, (v).size);                                    \
-    } while (0)
-#define vec_realloc(type, v, n)                                                \
-    do {                                                                       \
-        if ((n) == (v).capacity)                                               \
-            break;                                                             \
-        type *_newData = realloc((v).data, sizeof(type) * (n));                \
-        if (!_newData && (n) > 0) {                                            \
-            perror("realloc failed");                                          \
+        v->capacity = n;                                                       \
+        if (v->size > n)                                                       \
+            v->size = n;                                                       \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, push, fn_name)(name * v,     \
+                                                                 type x) {     \
+        if (v->size >= v->capacity)                                            \
+            __vec_fn_name_format(name, realloc, fn_name)(                      \
+                v, v->capacity > 1 ? (v->capacity + (v->capacity >> 1)) : 2);  \
+        v->data[v->size++] = x;                                                \
+    }                                                                          \
+                                                                               \
+    static inline type __vec_fn_name_format(name, pop, fn_name)(name * v) {    \
+        return v->data[--v->size];                                             \
+    }                                                                          \
+                                                                               \
+    static inline type *__vec_fn_name_format(name, back, fn_name)(name * v) {  \
+        return &v->data[v->size - 1];                                          \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, clear, fn_name)(name * v) {  \
+        v->size = 0;                                                           \
+    }                                                                          \
+                                                                               \
+    static inline int __vec_fn_name_format(name, empty, fn_name)(name * v) {   \
+        return v->size == 0;                                                   \
+    }                                                                          \
+                                                                               \
+    static inline type __vec_fn_name_format(name, at, fn_name)(name * v,       \
+                                                               size_t i) {     \
+        if (i < 0 || i >= v->size) {                                           \
+            perror("vector index out of bounds");                              \
             exit(EXIT_FAILURE);                                                \
         }                                                                      \
-        (v).data = _newData;                                                   \
-        (v).capacity = (n);                                                    \
-        if ((v).size > (n))                                                    \
-            (v).size = (n);                                                    \
-    } while (0)
-#define vec_reserve(type, v, n)                                                \
-    do {                                                                       \
-        if ((n) > (v).capacity)                                                \
-            vec_realloc(type, v, n);                                           \
-    } while (0)
-#define vec_print(type, fn, v, indent)                                         \
-    do {                                                                       \
-        if (!(v).data)                                                         \
-            break;                                                             \
+        return v->data[i];                                                     \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, set, fn_name)(               \
+        name * v, size_t i, type x) {                                          \
+        if (i < 0 || i >= v->size) {                                           \
+            perror("vector index out of bounds");                              \
+            exit(EXIT_FAILURE);                                                \
+        }                                                                      \
+        v->data[i] = x;                                                        \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, resize, fn_name)(            \
+        name * v, size_t n, type def_val) {                                    \
+        if (n > v->capacity) {                                                 \
+            __vec_fn_name_format(name, realloc, fn_name)(v, n);                \
+            if (n != 0) {                                                      \
+                while (v->size < n) {                                          \
+                    v->data[v->size++] = def_val;                              \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        v->size = n;                                                           \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, shrink, fn_name)(name * v) { \
+        if (v->size != v->capacity)                                            \
+            __vec_fn_name_format(name, realloc, fn_name)(v, v->size);          \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, reserve,                     \
+                                            fn_name)(name * v, size_t n) {     \
+        if (n > v->capacity)                                                   \
+            __vec_fn_name_format(name, realloc, fn_name)(v, n);                \
+    }
+
+#define vec_define_print(type, name, fn_name, print_name)                      \
+    static inline void fn_name(name *v, int indent) {                          \
+        if (!v->data) {                                                        \
+            printf(#type "([])");                                              \
+            return;                                                            \
+        }                                                                      \
         printf(#type "([");                                                    \
-        if ((v).size != 0)                                                     \
-            putchar('\n');                                                     \
-        for (int __i0 = 0; __i0 < (v).size; __i0++) {                          \
+        if (v->size == 0) {                                                    \
+            printf("])");                                                      \
+            return;                                                            \
+        }                                                                      \
+        putchar('\n');                                                         \
+        for (int i = 0; i < v->size; i++) {                                    \
             ___vec_print_indent(indent);                                       \
-            fn((v).data[__i0], (indent) + 2);                                  \
-            if (__i0 < (v).size - 1)                                           \
+            print_name(v->data[i], indent + 2);                                \
+            if (i < v->size - 1)                                               \
                 putchar(',');                                                  \
             putchar('\n');                                                     \
         }                                                                      \
-        ___vec_print_indent((indent) - 1);                                     \
+        ___vec_print_indent(indent - 1);                                       \
         putchar(']');                                                          \
         putchar(')');                                                          \
-    } while (0)
-#define vec_free(v) free(v.data)
-#define vec_free2(v, fn)                                                       \
-    do {                                                                       \
-        if (!(v).data)                                                         \
-            break;                                                             \
-        for (int __i0 = 0; __i0 < (v).size; __i0++) {                          \
-            fn((v).data[__i0]);                                                \
+    }
+
+#define vec_define_free(type, name, fn_name, free_fn)                          \
+    static inline void fn_name(name *v) {                                      \
+        if (!v || !v->data)                                                    \
+            return;                                                            \
+        for (int i = 0; i < v->size; i++) {                                    \
+            free_fn(v->data[i]);                                               \
         }                                                                      \
-        free((v).data);                                                        \
-    } while (0)
+        free(v->data);                                                         \
+    }                                                                          \
+    static inline void fn_name##_heap(name *v) {                               \
+        fn_name(v);                                                            \
+        free(v);                                                               \
+    }
+
 #define ___vec_print_indent(indent)                                            \
     do {                                                                       \
-        for (int __i1 = 0; __i1 < indent * 2; __i1++)                          \
+        for (int __i1 = 0; __i1 < (indent) * 2; __i1++)                        \
             putchar(' ');                                                      \
     } while (0)
 
-#endif // VEC_H_DEFINED
+#endif // VEC_V2_H_DEFINED
