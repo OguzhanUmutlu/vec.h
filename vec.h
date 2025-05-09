@@ -1,5 +1,5 @@
-#ifndef VEC_V2_H_DEFINED
-#define VEC_V2_H_DEFINED
+#ifndef VEC_H_DEFINED
+#define VEC_H_DEFINED
 
 /*
  *                     __
@@ -181,4 +181,4 @@
             putchar(' ');                                                      \
     } while (0)
 
-#endif // VEC_V2_H_DEFINED
+#endif // VEC_H_DEFINED

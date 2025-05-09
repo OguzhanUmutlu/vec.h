@@ -1,5 +1,5 @@
-#ifndef VEC_V1_H_DEFINED
-#define VEC_V1_H_DEFINED
+#ifndef VEC_H_LEGACY_DEFINED
+#define VEC_H_LEGACY_DEFINED
 
 /*
  *                     __
@@ -8,7 +8,7 @@
  * | |/ /  __/ /___ / / / /
  * |___/\___/\___(_)_/ /_/
  *
- * vec.h - Lightweight dynamic array implementation using macros in C.
+ * vec_legacy.h - Lightweight dynamic array implementation using macros in C.
  * Supports both value (`vec_*`) and pointer (`vec_*_p`) access styles.
  * Author: OguzhanUmutlu
  * License: MIT
@@ -296,4 +296,4 @@
 #define __vec_type_assert_p(type, var) (0)
 #endif
 
-#endif // VEC_V1_H_DEFINED
+#endif // VEC_H_LEGACY_DEFINED
