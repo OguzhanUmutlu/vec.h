@@ -39,6 +39,8 @@ This creates a vector type called `VecInt` with functions prefixed with `int_vec
 #include <stdio.h>
 #include "vec.h"
 
+// Defines the vector type VecInt that contains int elements
+// int_vec determines the function prefix
 vec_define(int, VecInt, int_vec);
 
 int main() {
@@ -100,7 +102,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 🔧 Initialization & Allocation
 
 | Function                       | Description                                   | Example                         |
-|--------------------------------|-----------------------------------------------|---------------------------------|
+| ------------------------------ | --------------------------------------------- | ------------------------------- |
 | `vec_alloc_NAME()`             | Allocates a vector on the heap.               | `VecInt *v = vec_alloc_NAME();` |
 | `vec_init_NAME(&v)`            | Initializes vector with default capacity (4). | `vec_init_NAME(&v);`            |
 | `vec_init2_NAME(&v, capacity)` | Initializes vector with specific capacity.    | `vec_init2_NAME(&v, 16);`       |
@@ -110,7 +112,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 📦 Data Manipulation
 
 | Function                         | Description                                   | Example                          |
-|----------------------------------|-----------------------------------------------|----------------------------------|
+| -------------------------------- | --------------------------------------------- | -------------------------------- |
 | `vec_push_NAME(&v, value)`       | Adds an element to the end.                   | `vec_push_NAME(&v, 42);`         |
 | `vec_pop_NAME(&v)`               | Removes and returns the last element.         | `int x = vec_pop_NAME(&v);`      |
 | `vec_back_NAME(&v)`              | Gets a pointer to the last element.           | `int *last = vec_back_NAME(&v);` |
@@ -122,13 +124,30 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 🧹 Management
 
 | Function                                       | Description                                               | Example                                   |
-|------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
+| ---------------------------------------------- | --------------------------------------------------------- | ----------------------------------------- |
 | `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                     |
 | `vec_empty_NAME(&v)`                           | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(&v)) { /* empty */ }` |
 | `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`             |
 | `vec_shrink_NAME(&v)`                          | Shrinks capacity to match size.                           | `vec_shrink_NAME(&v);`                    |
 | `vec_reserve_NAME(&v, capacity)`               | Ensures vector can hold at least `capacity` elements.     | `vec_reserve_NAME(&v, 100);`              |
 | `vec_realloc_NAME(&v, capacity)`               | Reallocates to a new capacity (use with caution).         | `vec_realloc_NAME(&v, 50);`               |
+
+---
+
+### Changing the function name convention
+
+The function name format can be simply changed by defining `__vec_fn_name_format` macro before including the library:
+
+```c
+#define __vec_fn_name_format(name, base, fn_name) hello_##base##_fn_name
+#include "vec.h" // has to be after the macro
+```
+
+In the macro:
+
+* `name`: The name of the vector like `VecInt`
+* `base`: The name of the function like `push`
+* `fn_name`: The third argument when defining the vector like `int_vec`
 
 ---
 

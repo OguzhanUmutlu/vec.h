@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #ifndef __vec_fn_name_format
-#define __vec_fn_name_format(name, base, fn_name) vec_##base##_fn_name
+    #define __vec_fn_name_format(name, base, fn_name) vec_##base##_##fn_name
 #endif
 
 #define vec_define(type, name, fn_name)                                        \
@@ -140,12 +140,12 @@
 #define vec_define_print(type, name, fn_name, print_name)                      \
     static inline void fn_name(name *v, int indent) {                          \
         if (!v->data) {                                                        \
-            printf(#type "([])");                                              \
+            printf(#type "[]");                                                \
             return;                                                            \
         }                                                                      \
-        printf(#type "([");                                                    \
+        printf(#type "[");                                                     \
         if (v->size == 0) {                                                    \
-            printf("])");                                                      \
+            printf("]");                                                       \
             return;                                                            \
         }                                                                      \
         putchar('\n');                                                         \
@@ -158,7 +158,6 @@
         }                                                                      \
         ___vec_print_indent(indent - 1);                                       \
         putchar(']');                                                          \
-        putchar(')');                                                          \
     }
 
 #define vec_define_free(type, name, fn_name, free_fn)                          \
