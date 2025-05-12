@@ -23,7 +23,7 @@
 
 #define vec_define(type, name, fn_name)                                        \
     typedef struct {                                                           \
-        int size, capacity;                                                    \
+        size_t size, capacity;                                                 \
         type *data;                                                            \
     } name;                                                                    \
                                                                                \
@@ -91,7 +91,7 @@
         v->size = 0;                                                           \
     }                                                                          \
                                                                                \
-    static inline int __vec_fn_name_format(name, empty, fn_name)(name * v) {   \
+    static inline bool __vec_fn_name_format(name, empty, fn_name)(name * v) {  \
         return v->size == 0;                                                   \
     }                                                                          \
                                                                                \
@@ -138,7 +138,7 @@
     }
 
 #define vec_define_print(type, name, fn_name, print_name)                      \
-    static inline void fn_name(name *v, int indent) {                          \
+    static inline void fn_name(name *v, size_t indent) {                       \
         if (!v->data) {                                                        \
             printf(#type "[]");                                                \
             return;                                                            \
@@ -149,7 +149,7 @@
             return;                                                            \
         }                                                                      \
         putchar('\n');                                                         \
-        for (int i = 0; i < v->size; i++) {                                    \
+        for (size_t i = 0; i < v->size; i++) {                                 \
             ___vec_print_indent(indent);                                       \
             print_name(v->data[i], indent + 2);                                \
             if (i < v->size - 1)                                               \
@@ -164,7 +164,7 @@
     static inline void fn_name(name *v) {                                      \
         if (!v || !v->data)                                                    \
             return;                                                            \
-        for (int i = 0; i < v->size; i++) {                                    \
+        for (size_t i = 0; i < v->size; i++) {                                 \
             free_fn(v->data[i]);                                               \
         }                                                                      \
         free(v->data);                                                         \
@@ -176,7 +176,7 @@
 
 #define ___vec_print_indent(indent)                                            \
     do {                                                                       \
-        for (int __i1 = 0; __i1 < (indent) * 2; __i1++)                        \
+        for (size_t __i1 = 0; __i1 < (indent) * 2; __i1++)                     \
             putchar(' ');                                                      \
     } while (0)
 
