@@ -137,6 +137,24 @@
             __vec_fn_name_format(name, realloc, fn_name)(v, n);                \
     }
 
+#define vec_define_contains(type, name, fn_name)                               \
+    static inline bool fn_name(name *v, type k) {                              \
+        for (size_t i = 0; i < v->size; i++) {                                 \
+            if (v->data[i] == k)                                               \
+                return true;                                                   \
+        }                                                                      \
+        return false;                                                          \
+    }
+
+#define vec_define_contains_fn(type, name, fn_name, eq_name)                   \
+    static inline bool fn_name(name *v, type k) {                              \
+        for (size_t i = 0; i < v->size; i++) {                                 \
+            if (eq_name(v->data[i], k))                                        \
+                return true;                                                   \
+        }                                                                      \
+        return false;                                                          \
+    }
+
 #define vec_define_print(type, name, fn_name, print_name)                      \
     static inline void fn_name(name *v, size_t indent) {                       \
         if (!v->data) {                                                        \

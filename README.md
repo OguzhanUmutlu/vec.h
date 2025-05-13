@@ -9,7 +9,7 @@ with resizable arrays as easy and intuitive as possible — without needing to m
 * Customizable for any data type
 * Auto-resizing
 * Basic vector operations: push, pop, resize, clear, free, etc.
-* Optional printing and memory freeing hooks
+* Optional printing, contains method and memory freeing hooks
 
 ---
 
@@ -102,7 +102,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 🔧 Initialization & Allocation
 
 | Function                       | Description                                   | Example                         |
-| ------------------------------ | --------------------------------------------- | ------------------------------- |
+|--------------------------------|-----------------------------------------------|---------------------------------|
 | `vec_alloc_NAME()`             | Allocates a vector on the heap.               | `VecInt *v = vec_alloc_NAME();` |
 | `vec_init_NAME(&v)`            | Initializes vector with default capacity (4). | `vec_init_NAME(&v);`            |
 | `vec_init2_NAME(&v, capacity)` | Initializes vector with specific capacity.    | `vec_init2_NAME(&v, 16);`       |
@@ -112,7 +112,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 📦 Data Manipulation
 
 | Function                         | Description                                   | Example                          |
-| -------------------------------- | --------------------------------------------- | -------------------------------- |
+|----------------------------------|-----------------------------------------------|----------------------------------|
 | `vec_push_NAME(&v, value)`       | Adds an element to the end.                   | `vec_push_NAME(&v, 42);`         |
 | `vec_pop_NAME(&v)`               | Removes and returns the last element.         | `int x = vec_pop_NAME(&v);`      |
 | `vec_back_NAME(&v)`              | Gets a pointer to the last element.           | `int *last = vec_back_NAME(&v);` |
@@ -124,7 +124,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 🧹 Management
 
 | Function                                       | Description                                               | Example                                   |
-| ---------------------------------------------- | --------------------------------------------------------- | ----------------------------------------- |
+|------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
 | `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                     |
 | `vec_empty_NAME(&v)`                           | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(&v)) { /* empty */ }` |
 | `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`             |
@@ -148,6 +148,36 @@ In the macro:
 * `name`: The name of the vector like `VecInt`
 * `base`: The name of the function like `push`
 * `fn_name`: The third argument when defining the vector like `int_vec`
+
+---
+
+### 🧩 Optional: Contains method
+
+To define a contains method for your vector type:
+
+```c
+vec_define_contains(int, VecInt, vec_contains_VecInt)
+```
+
+Then use it:
+
+```c
+int_vec_contains(&v, 42); // returns 1 if 42 is in the vector
+```
+
+You can also define a custom comparison function, useful in structs:
+
+```c
+int my_compare(int a, int b) {
+    return a == b; // or any other comparison logic
+}
+```
+
+Then use it to define your contains method:
+
+```c
+vec_define_contains_fn(int, VecInt, vec_contains_VecInt, my_compare)
+```
 
 ---
 
@@ -216,4 +246,5 @@ Found a bug? Have an improvement idea? Feel free to open an issue or submit a pu
 ---
 
 📁 **Looking for the previous version?**
-The legacy implementation has been preserved in [`README_legacy.md`](./README_legacy.md) and [`vec_legacy.h`](./vec_legacy.h) for reference.
+The legacy implementation has been preserved in [`README_legacy.md`](./README_legacy.md) and [
+`vec_legacy.h`](./vec_legacy.h) for reference.
