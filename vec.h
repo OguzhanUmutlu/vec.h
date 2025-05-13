@@ -80,11 +80,11 @@
     }                                                                          \
                                                                                \
     static inline type __vec_fn_name_format(name, pop, fn_name)(name * v) {    \
-        return v->data[--v->size];                                             \
+        return v->data[v->size == 0 ? 0 : --v->size];                          \
     }                                                                          \
                                                                                \
     static inline type *__vec_fn_name_format(name, back, fn_name)(name * v) {  \
-        return &v->data[v->size - 1];                                          \
+        return v->size == 0 ? NULL : &v->data[v->size - 1];                    \
     }                                                                          \
                                                                                \
     static inline void __vec_fn_name_format(name, clear, fn_name)(name * v) {  \
@@ -174,7 +174,7 @@
                 putchar(',');                                                  \
             putchar('\n');                                                     \
         }                                                                      \
-        ___vec_print_indent(indent - 1);                                       \
+        ___vec_print_indent(indent == 0 ? 0 : indent - 1);                     \
         putchar(']');                                                          \
     }
 
