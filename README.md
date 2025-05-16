@@ -127,6 +127,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 | ---------------------------------------------- | --------------------------------------------------------- | ---------------------------------------- |
 | `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                    |
 | `vec_empty_NAME(v)`                            | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(v)) { /* empty */ }` |
+| `vec_reverse_NAME(&v)`                         | Reverses the vector.                                      | `vec_reverse_NAME(&v);`                  |
 | `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`            |
 | `vec_shrink_NAME(&v)`                          | Shrinks capacity to match size.                           | `vec_shrink_NAME(&v);`                   |
 | `vec_reserve_NAME(&v, capacity)`               | Ensures vector can hold at least `capacity` elements.     | `vec_reserve_NAME(&v, 100);`             |

@@ -135,6 +135,15 @@
                                             fn_name)(name * v, size_t n) {     \
         if (n > v->capacity)                                                   \
             __vec_fn_name_format(name, realloc, fn_name)(v, n);                \
+    }                                                                          \
+                                                                               \
+    static inline void __vec_fn_name_format(name, reverse,                     \
+                                            fn_name)(name * v) {               \
+        for (size_t i = 0; i < v->size / 2; i++) {                             \
+            type tmp = v->data[i];                                             \
+            v->data[i] = v->data[v->size - 1 - i];                             \
+            v->data[v->size - 1 - i] = tmp;                                    \
+        }                                                                      \
     }
 
 #define vec_define_contains(type, name, fn_name)                               \
