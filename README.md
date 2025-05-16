@@ -58,11 +58,11 @@ int main() {
     }
 
     // Access an element
-    printf("Element at index 1: %d\n", int_vec_at(&v, 1));
+    printf("Element at index 1: %d\n", int_vec_at(v, 1));
 
     // Modify an element
     int_vec_set(&v, 1, 200);
-    printf("Modified element at index 1: %d\n", int_vec_at(&v, 1));
+    printf("Modified element at index 1: %d\n", int_vec_at(v, 1));
 
     // Remove last element
     int popped = int_vec_pop(&v);
@@ -102,7 +102,7 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 ### 🔧 Initialization & Allocation
 
 | Function                       | Description                                   | Example                         |
-|--------------------------------|-----------------------------------------------|---------------------------------|
+| ------------------------------ | --------------------------------------------- | ------------------------------- |
 | `vec_alloc_NAME()`             | Allocates a vector on the heap.               | `VecInt *v = vec_alloc_NAME();` |
 | `vec_init_NAME(&v)`            | Initializes vector with default capacity (4). | `vec_init_NAME(&v);`            |
 | `vec_init2_NAME(&v, capacity)` | Initializes vector with specific capacity.    | `vec_init2_NAME(&v, 16);`       |
@@ -111,26 +111,26 @@ Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
 
 ### 📦 Data Manipulation
 
-| Function                         | Description                                   | Example                          |
-|----------------------------------|-----------------------------------------------|----------------------------------|
-| `vec_push_NAME(&v, value)`       | Adds an element to the end.                   | `vec_push_NAME(&v, 42);`         |
-| `vec_pop_NAME(&v)`               | Removes and returns the last element.         | `int x = vec_pop_NAME(&v);`      |
-| `vec_back_NAME(&v)`              | Gets a pointer to the last element.           | `int *last = vec_back_NAME(&v);` |
-| `vec_at_NAME(&v, index)`         | Gets a value at an index (with bounds check). | `int x = vec_at_NAME(&v, 2);`    |
-| `vec_set_NAME(&v, index, value)` | Sets the value at a given index.              | `vec_set_NAME(&v, 1, 99);`       |
+| Function                         | Description                                   | Example                         |
+| -------------------------------- | --------------------------------------------- | ------------------------------- |
+| `vec_push_NAME(&v, value)`       | Adds an element to the end.                   | `vec_push_NAME(&v, 42);`        |
+| `vec_pop_NAME(&v)`               | Removes and returns the last element.         | `int x = vec_pop_NAME(&v);`     |
+| `vec_back_NAME(v)`               | Gets a pointer to the last element.           | `int *last = vec_back_NAME(v);` |
+| `vec_at_NAME(v, index)`          | Gets a value at an index (with bounds check). | `int x = vec_at_NAME(v, 2);`    |
+| `vec_set_NAME(&v, index, value)` | Sets the value at a given index.              | `vec_set_NAME(&v, 1, 99);`      |
 
 ---
 
 ### 🧹 Management
 
-| Function                                       | Description                                               | Example                                   |
-|------------------------------------------------|-----------------------------------------------------------|-------------------------------------------|
-| `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                     |
-| `vec_empty_NAME(&v)`                           | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(&v)) { /* empty */ }` |
-| `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`             |
-| `vec_shrink_NAME(&v)`                          | Shrinks capacity to match size.                           | `vec_shrink_NAME(&v);`                    |
-| `vec_reserve_NAME(&v, capacity)`               | Ensures vector can hold at least `capacity` elements.     | `vec_reserve_NAME(&v, 100);`              |
-| `vec_realloc_NAME(&v, capacity)`               | Reallocates to a new capacity (use with caution).         | `vec_realloc_NAME(&v, 50);`               |
+| Function                                       | Description                                               | Example                                  |
+| ---------------------------------------------- | --------------------------------------------------------- | ---------------------------------------- |
+| `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                    |
+| `vec_empty_NAME(v)`                            | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(v)) { /* empty */ }` |
+| `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`            |
+| `vec_shrink_NAME(&v)`                          | Shrinks capacity to match size.                           | `vec_shrink_NAME(&v);`                   |
+| `vec_reserve_NAME(&v, capacity)`               | Ensures vector can hold at least `capacity` elements.     | `vec_reserve_NAME(&v, 100);`             |
+| `vec_realloc_NAME(&v, capacity)`               | Reallocates to a new capacity (use with caution).         | `vec_realloc_NAME(&v, 50);`              |
 
 ---
 
@@ -162,7 +162,7 @@ vec_define_contains(int, VecInt, vec_contains_VecInt)
 Then use it:
 
 ```c
-int_vec_contains(&v, 42); // returns 1 if 42 is in the vector
+int_vec_contains(v, 42); // returns 1 if 42 is in the vector
 ```
 
 You can also define a custom comparison function, useful in structs:
@@ -200,7 +200,7 @@ void my_int_print(int x, int indent) {
 Use like:
 
 ```c
-vec_print_NAME(&v, 1);
+vec_print_NAME(v, 1);
 ```
 
 ---
@@ -210,13 +210,13 @@ vec_print_NAME(&v, 1);
 For complex types:
 
 ```c
-vec_define_free(MyStruct, VecStruct, vec_free_NAME, my_struct_free)
+vec_define_free(MyStruct, VecStruct, vec_free_NAME, vec_struct_free)
 ```
 
 And define:
 
 ```c
-void my_struct_free(MyStruct s) {
+void vec_struct_free(VecStruct s) {
     // this will be called for each element in the vector
     free(s.ptr); // or whatever cleanup is needed
 }
@@ -225,8 +225,11 @@ void my_struct_free(MyStruct s) {
 Then call:
 
 ```c
-vec_free_NAME(&v);        // for stack-allocated
-vec_free_NAME_heap(&v);   // for heap-allocated (also frees the vector itself)
+// if you are using a stack-allocated vector use:
+vec_free_NAME(&v);
+
+// if you have used the _alloc() feature to allocate the vector in the heap use this(will also free itself):
+vec_free_NAME_heap(v);
 ```
 
 ---

@@ -83,25 +83,25 @@
         return v->data[v->size == 0 ? 0 : --v->size];                          \
     }                                                                          \
                                                                                \
-    static inline type *__vec_fn_name_format(name, back, fn_name)(name * v) {  \
-        return v->size == 0 ? NULL : &v->data[v->size - 1];                    \
+    static inline type *__vec_fn_name_format(name, back, fn_name)(name v) {    \
+        return v.size == 0 ? NULL : &v.data[v.size - 1];                       \
     }                                                                          \
                                                                                \
     static inline void __vec_fn_name_format(name, clear, fn_name)(name * v) {  \
         v->size = 0;                                                           \
     }                                                                          \
                                                                                \
-    static inline bool __vec_fn_name_format(name, empty, fn_name)(name * v) {  \
-        return v->size == 0;                                                   \
+    static inline bool __vec_fn_name_format(name, empty, fn_name)(name v) {    \
+        return v.size == 0;                                                    \
     }                                                                          \
                                                                                \
-    static inline type __vec_fn_name_format(name, at, fn_name)(name * v,       \
+    static inline type __vec_fn_name_format(name, at, fn_name)(name v,         \
                                                                size_t i) {     \
-        if (i < 0 || i >= v->size) {                                           \
+        if (i < 0 || i >= v.size) {                                            \
             perror("vector index out of bounds");                              \
             exit(EXIT_FAILURE);                                                \
         }                                                                      \
-        return v->data[i];                                                     \
+        return v.data[i];                                                      \
     }                                                                          \
                                                                                \
     static inline void __vec_fn_name_format(name, set, fn_name)(               \
@@ -138,39 +138,39 @@
     }
 
 #define vec_define_contains(type, name, fn_name)                               \
-    static inline bool fn_name(name *v, type k) {                              \
-        for (size_t i = 0; i < v->size; i++) {                                 \
-            if (v->data[i] == k)                                               \
+    static inline bool fn_name(name v, type k) {                               \
+        for (size_t i = 0; i < v.size; i++) {                                  \
+            if (v.data[i] == k)                                                \
                 return true;                                                   \
         }                                                                      \
         return false;                                                          \
     }
 
 #define vec_define_contains_fn(type, name, fn_name, eq_name)                   \
-    static inline bool fn_name(name *v, type k) {                              \
-        for (size_t i = 0; i < v->size; i++) {                                 \
-            if (eq_name(v->data[i], k))                                        \
+    static inline bool fn_name(name v, type k) {                               \
+        for (size_t i = 0; i < v.size; i++) {                                  \
+            if (eq_name(v.data[i], k))                                         \
                 return true;                                                   \
         }                                                                      \
         return false;                                                          \
     }
 
 #define vec_define_print(type, name, fn_name, print_name)                      \
-    static inline void fn_name(name *v, size_t indent) {                       \
-        if (!v->data) {                                                        \
+    static inline void fn_name(name v, size_t indent) {                        \
+        if (!v.data) {                                                         \
             printf(#type "[]");                                                \
             return;                                                            \
         }                                                                      \
         printf(#type "[");                                                     \
-        if (v->size == 0) {                                                    \
+        if (v.size == 0) {                                                     \
             printf("]");                                                       \
             return;                                                            \
         }                                                                      \
         putchar('\n');                                                         \
-        for (size_t i = 0; i < v->size; i++) {                                 \
+        for (size_t i = 0; i < v.size; i++) {                                  \
             ___vec_print_indent(indent);                                       \
-            print_name(v->data[i], indent + 2);                                \
-            if (i < v->size - 1)                                               \
+            print_name(v.data[i], indent + 2);                                 \
+            if (i < v.size - 1)                                                \
                 putchar(',');                                                  \
             putchar('\n');                                                     \
         }                                                                      \
@@ -186,6 +186,7 @@
             free_fn(v->data[i]);                                               \
         }                                                                      \
         free(v->data);                                                         \
+        v->data = NULL;                                                        \
     }                                                                          \
     static inline void fn_name##_heap(name *v) {                               \
         fn_name(v);                                                            \
