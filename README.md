@@ -9,7 +9,7 @@ with resizable arrays as easy and intuitive as possible — without needing to m
 * Customizable for any data type
 * Auto-resizing
 * Basic vector operations: push, pop, resize, clear, free, etc.
-* Optional printing, contains method and memory freeing hooks
+* Optional methods: contains, sort, sort_reversed, print, print_indent
 
 ---
 
@@ -26,10 +26,10 @@ with resizable arrays as easy and intuitive as possible — without needing to m
 To create a dynamic array of `int`, do:
 
 ```c
-vec_define(int, VecInt, int_vec);
+vec_define(int, ints, int_vec);
 ```
 
-This creates a vector type called `VecInt` with functions prefixed with `int_vec`.
+This creates a vector type called `ints` with functions prefixed with `int_vec`.
 
 ---
 
@@ -39,37 +39,46 @@ This creates a vector type called `VecInt` with functions prefixed with `int_vec
 #include <stdio.h>
 #include "vec.h"
 
-// Defines the vector type VecInt that contains int elements
-// int_vec determines the function prefix
-vec_define(int, VecInt, int_vec);
+typedef struct Person {
+    char name[50];
+    int age;
+} Person;
+
+vec_define(Person, People);
+vec_define_free_simple(Person, People);
 
 int main() {
-    VecInt v;
-    int_vec_init(&v);  // Initialize the vector
+    People people;
+    people_init(&people);  // Initialize the vector
 
     // Add elements
-    int_vec_push(&v, 10);
-    int_vec_push(&v, 20);
-    int_vec_push(&v, 30);
+    Person p1 = {"Alice", 30};
+    Person p2 = {"Bob", 25};
+    Person p3 = {"Charlie", 35};
+
+    people_push(&people, p1);
+    people_push(&people, p2);
+    people_push(&people, p3);
 
     // Print elements
-    for (int i = 0; i < v.size; i++) {
-        printf("v[%d] = %d\n", i, v.data[i]);
-    }
+    people_print(people);
 
     // Access an element
-    printf("Element at index 1: %d\n", int_vec_at(v, 1));
+    Person p = people_at(people, 1);
+    printf("Element at index 1: { name: \"%s\", age: %d }\n", p.name, p.age);
 
     // Modify an element
-    int_vec_set(&v, 1, 200);
-    printf("Modified element at index 1: %d\n", int_vec_at(v, 1));
+    Person updated = {"Bob Jr.", 26};
+    people_set(&people, 1, updated);
+    printf("Modified element at index 1: { name: \"%s\", age: %d }\n",
+           people_at(people, 1).name, people_at(people, 1).age);
 
     // Remove last element
-    int popped = int_vec_pop(&v);
-    printf("Popped: %d\n", popped);
+    Person popped = people_pop(&people);
+    printf("Popped: { name: \"%s\", age: %d }\n", popped.name, popped.age);
 
     // Clean up
-    free(v.data);
+    people_clear(people);
     return 0;
 }
 ```
@@ -78,159 +87,145 @@ int main() {
 
 ## 🧪 Output
 
+```c
+Element at index 1: { name: "Bob", age: 25 }
+Modified element at index 1: { name: "Bob Jr.", age: 26 }
+Popped: { name: "Charlie", age: 35 }
 ```
-v[0] = 10
-v[1] = 20
-v[2] = 30
-Element at index 1: 20
-Modified element at index 1: 200
-Popped: 30
+
+## 🔍 Example with Primitive Types
+
+```c
+#include <stdio.h>
+#include "vec.h"
+
+// Creates a vector of integers named `ints`
+vec_define_primitive(int);
+
+int main() {
+    ints v;
+    ints_init(&v);
+
+    ints_push(&v, 10);
+    ints_push(&v, 30);
+    ints_push(&v, 20);
+    ints_push(&v, 50);
+    ints_push(&v, 5);
+
+    printf("Popped %d\n", ints_pop(&v));
+
+    ints_print(v);
+    printf("\n");
+
+    // Sort the vector
+    ints_sort(&v);
+
+    // Reverse the vector
+    ints_reverse(&v);
+
+    // Clean up
+    ints_clear(&v);
+    return 0;
+}
 ```
 
 ## 🛠️ Technical Overview of All Functions
 
-Below is a full list of available vector functions. These are generated using:
+Below is a full list of available default vector functions. These are generated using:
 
 ```c
-vec_define(type, VectorName, NAME)
+vec_define(type, NAME)
 ```
 
-Once defined, you can call functions like `vec_init_NAME`, `vec_push_NAME`, etc.
+Or use `vec_define2` to specify the function suffix:
+
+```c
+vec_define2(type, my_vec, NAME) // vector's type is my_vec and functions start with NAME
+```
+
+Once defined, you can call functions like `NAME_init`, `NAME_push`, etc.
 
 ---
 
 ### 🔧 Initialization & Allocation
 
-| Function                       | Description                                   | Example                         |
-| ------------------------------ | --------------------------------------------- | ------------------------------- |
-| `vec_alloc_NAME()`             | Allocates a vector on the heap.               | `VecInt *v = vec_alloc_NAME();` |
-| `vec_init_NAME(&v)`            | Initializes vector with default capacity (4). | `vec_init_NAME(&v);`            |
-| `vec_init2_NAME(&v, capacity)` | Initializes vector with specific capacity.    | `vec_init2_NAME(&v, 16);`       |
+| Function                           | Description                                   | Example                       |
+| ---------------------------------- | --------------------------------------------- | ----------------------------- |
+| `NAME_alloc()`                     | Allocates a vector on the heap.               | `NAME *v = NAME_alloc();`     |
+| `NAME_init(&v)`                    | Initializes vector with default capacity (4). | `NAME_init(&v);`              |
+| `NAME_init_reserved(&v, capacity)` | Initializes vector with specific capacity.    | `NAME_init_reserved(&v, 16);` |
 
 ---
 
 ### 📦 Data Manipulation
 
-| Function                         | Description                                   | Example                         |
-| -------------------------------- | --------------------------------------------- | ------------------------------- |
-| `vec_push_NAME(&v, value)`       | Adds an element to the end.                   | `vec_push_NAME(&v, 42);`        |
-| `vec_pop_NAME(&v)`               | Removes and returns the last element.         | `int x = vec_pop_NAME(&v);`     |
-| `vec_back_NAME(v)`               | Gets a pointer to the last element.           | `int *last = vec_back_NAME(v);` |
-| `vec_at_NAME(v, index)`          | Gets a value at an index (with bounds check). | `int x = vec_at_NAME(v, 2);`    |
-| `vec_set_NAME(&v, index, value)` | Sets the value at a given index.              | `vec_set_NAME(&v, 1, 99);`      |
+| Function                     | Description                                   | Example                     |
+| ---------------------------- | --------------------------------------------- | --------------------------- |
+| `NAME_push(&v, value)`       | Adds an element to the end.                   | `NAME_push(&v, 42);`        |
+| `NAME_pop(&v)`               | Removes and returns the last element.         | `int x = NAME_pop(&v);`     |
+| `NAME_back(v)`               | Gets a pointer to the last element.           | `int *last = NAME_back(v);` |
+| `NAME_at(v, index)`          | Gets a value at an index (with bounds check). | `int x = NAME_at(v, 2);`    |
+| `NAME_set(&v, index, value)` | Sets the value at a given index.              | `NAME_set(&v, 1, 99);`      |
 
 ---
 
 ### 🧹 Management
 
-| Function                                       | Description                                               | Example                                  |
-| ---------------------------------------------- | --------------------------------------------------------- | ---------------------------------------- |
-| `vec_clear_NAME(&v)`                           | Clears the vector (sets size to 0).                       | `vec_clear_NAME(&v);`                    |
-| `vec_empty_NAME(v)`                            | Checks if vector is empty. Returns 1 or 0.                | `if (vec_empty_NAME(v)) { /* empty */ }` |
-| `vec_reverse_NAME(&v)`                         | Reverses the vector.                                      | `vec_reverse_NAME(&v);`                  |
-| `vec_resize_NAME(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `vec_resize_NAME(&v, 10, 0);`            |
-| `vec_shrink_NAME(&v)`                          | Shrinks capacity to match size.                           | `vec_shrink_NAME(&v);`                   |
-| `vec_reserve_NAME(&v, capacity)`               | Ensures vector can hold at least `capacity` elements.     | `vec_reserve_NAME(&v, 100);`             |
-| `vec_realloc_NAME(&v, capacity)`               | Reallocates to a new capacity (use with caution).         | `vec_realloc_NAME(&v, 50);`              |
+| Function                     | Description                                           | Example                              |
+| ---------------------------- | ----------------------------------------------------- | ------------------------------------ |
+| `NAME_empty(v)`              | Checks if vector is empty. Returns 1 or 0.            | `if (NAME_empty(v)) { /* empty */ }` |
+| `NAME_reverse(&v)`           | Reverses the vector.                                  | `NAME_reverse(&v);`                  |
+| `NAME_shrink(&v)`            | Shrinks capacity to match size. (saves memory)        | `NAME_shrink(&v);`                   |
+| `NAME_reserve(&v, capacity)` | Ensures vector can hold at least `capacity` elements. | `NAME_reserve(&v, 100);`             |
+| `NAME_realloc(&v, capacity)` | Reallocates to a new capacity (not recommended).      | `NAME_realloc(&v, 50);`              |
 
 ---
 
-### Changing the function name convention
+### 🧩 Defining optional methods
 
-The function name format can be simply changed by defining `__vec_fn_name_format` macro before including the library:
+Here's a quick overview of optional methods you can define for your vector type:
+
+| Defined with          | Function                                   | Description                                               | Example                                     |
+| --------------------- | ------------------------------------------ | --------------------------------------------------------- | ------------------------------------------- |
+| `vec_define_contains` | `NAME_contains(v, value)`                  | Checks if the vector contains a value. Returns 1 or 0.    | `if (NAME_contains(v, 42)) { /* found */ }` |
+| `vec_define_sort`     | `NAME_sort(&v)`                            | Sorts the vector in place.                                | `NAME_sort(&v);`                            |
+| `vec_define_sort`     | `NAME_sort_reversed(&v)`                   | Sorts the vector in place (in reverse).                   | `NAME_sort_reversed(&v);`                   |
+| `vec_define_print`    | `NAME_print(v)`                            | Prints the vector elements.                               | `NAME_print(v);`                            |
+| `vec_define_print`    | `NAME_print_indent(v, indent)`             | Prints the vector elements with the given indentation.    | `NAME_print_indent(v, 6);`                  |
+| `vec_define_free`     | `NAME_resize(&v, new_size, default_value)` | Resizes the vector, filling new slots with default value. | `NAME_resize(&v, 10, default_value);`       |
+| `vec_define_free`     | `NAME_clear(&v)`                           | Frees every element and sets the size to 0.               | `NAME_clear(&v);`                           |
+
+Here are the macros to define these optional methods:
 
 ```c
-#define __vec_fn_name_format(name, base, fn_name) hello_##base##_fn_name
-#include "vec.h" // has to be after the macro
+vec_define_contains(type, vector_type, boolean_expression);
+vec_define_sort(type, vector_type, comparison_expression);
+vec_define_print(type, vector_type, printing_statement);
+vec_define_free(type, vector_type, free_statement);
+
+// OR if you want to specify the function prefix (by default function_prefix=vector_type)
+
+vec_define_contains2(type, vector_type, function_prefix, boolean_expression);
+vec_define_sort2(type, vector_type, function_prefix, comparison_expression);
+vec_define_print2(type, vector_type, function_prefix, printing_statement, newline); // if given true for newline, every element will be in a new line
+vec_define_free2(type, vector_type, function_prefix, free_statement);
+
 ```
 
-In the macro:
-
-* `name`: The name of the vector like `VecInt`
-* `base`: The name of the function like `push`
-* `fn_name`: The third argument when defining the vector like `int_vec`
-
----
-
-### 🧩 Optional: Contains method
-
-To define a contains method for your vector type:
+Here are the examples for defining these optional methods:
 
 ```c
-vec_define_contains(int, VecInt, vec_contains_VecInt)
-```
+vec_define_contains(int, ints, a == b);
+vec_define_sort(int, ints, a > b);
+vec_define_print(int, ints, printf("%d", a));
+vec_define_free(int, ints,); // Third argument is for freeing an element, it's an int so no need to. (Variable `a` is defined that is the element, free(a.some_prop) for example)
 
-Then use it:
+// And here's how you can specify the function prefix:
 
-```c
-int_vec_contains(v, 42); // returns 1 if 42 is in the vector
-```
-
-You can also define a custom comparison function, useful in structs:
-
-```c
-int my_compare(int a, int b) {
-    return a == b; // or any other comparison logic
-}
-```
-
-Then use it to define your contains method:
-
-```c
-vec_define_contains_fn(int, VecInt, vec_contains_VecInt, my_compare)
-```
-
----
-
-### 🖨️ Optional: Printing (if you define `vec_define_print`)
-
-To define a print function for debugging:
-
-```c
-vec_define_print(int, VecInt, vec_print_NAME, my_int_print)
-```
-
-Then implement:
-
-```c
-void my_int_print(int x, int indent) {
-    printf("%d", x);
-}
-```
-
-Use like:
-
-```c
-vec_print_NAME(v, 1);
-```
-
----
-
-### 🧼 Optional: Freeing Items (e.g. struct with malloc inside)
-
-For complex types:
-
-```c
-vec_define_free(MyStruct, VecStruct, vec_free_NAME, vec_struct_free)
-```
-
-And define:
-
-```c
-void vec_struct_free(VecStruct s) {
-    // this will be called for each element in the vector
-    free(s.ptr); // or whatever cleanup is needed
-}
-```
-
-Then call:
-
-```c
-// if you are using a stack-allocated vector use:
-vec_free_NAME(&v);
-
-// if you have used the _alloc() feature to allocate the vector in the heap use this(will also free itself):
-vec_free_NAME_heap(v);
+vec_define_contains2(int, ints, int_vec, a == b);
+vec_define_sort2(int, ints, int_vec, a > b);
+vec_define_print2(int, ints, int_vec, printf("%d", a), false); // last argument tells it to not put a newline
+vec_define_free2(int, ints, int_vec,);
 ```
 
 ---
@@ -245,10 +240,8 @@ This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE)
 
 Found a bug? Have an improvement idea? Feel free to open an issue or submit a pull request.
 
-> ⚠️ This library is intentionally minimal — you’re encouraged to adapt and extend it for your specific use cases.
-
 ---
 
 📁 **Looking for the previous version?**
-The legacy implementation has been preserved in [`README_legacy.md`](./README_legacy.md) and [
-`vec_legacy.h`](./vec_legacy.h) for reference.
+The legacy implementation has been preserved in [`README_legacy.md`](./README_legacy.md) and
+[`vec_legacy.h`](./vec_legacy.h) for reference.
